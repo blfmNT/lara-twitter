@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'last_name' => $this->last_name,
             'username' => $this->username,
             'name' => $this->name,
-            //'banned' => 0//show in later stage
+
         ];
     }
 }
