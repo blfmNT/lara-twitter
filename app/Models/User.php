@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-
+use App\Models\Tweet;
+use App\Models\Like;
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, SoftDeletes;
@@ -57,5 +59,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return Attribute::make(
             get: fn() => $this->first_name . ' ' . $this->last_name
         );
+    }
+
+    public function tweets(): HasMany
+    {
+        return $this->hasMany(Tweet::class, 'created_by', 'id');
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class, 'liked_by', 'id');
     }
 }

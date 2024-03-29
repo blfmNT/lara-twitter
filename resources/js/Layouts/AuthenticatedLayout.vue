@@ -7,15 +7,14 @@ import ResponsiveNavLink from '@/Components/ui/ResponsiveNavLink.vue';
 import {Link, usePage} from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+
 const authUser = usePage().props.auth.user;
 
-console.log(authUser);
-console.log(authUser.first_name);
 </script>
 
 <template>
     <div>
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="min-h-screen bg-gray-300 dark:bg-gray-900">
             <nav class="fixed top-0 w-full bg-gray-100 border-b border-gray-100">
                 <!-- Primary Navigation Menu -->
                 <div class="px-4 sm:px-6 lg:px-8">

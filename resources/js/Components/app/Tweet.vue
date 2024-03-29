@@ -1,25 +1,104 @@
 <script setup>
 
-defineProps({
+import {ShareIcon, ChatBubbleLeftIcon, XMarkIcon } from "@heroicons/vue/24/solid/index.js";
+import {HandThumbUpIcon} from "@heroicons/vue/24/outline/index.js";
+import {useForm, usePage} from "@inertiajs/vue3";
+
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
+import { ChevronUpIcon } from '@heroicons/vue/20/solid'
+
+const page = usePage();
+
+const props = defineProps({
     tweet: Object
 });
+
+const authUser = usePage().props.auth.user;
+
+const removeForm = useForm({
+    tweet_id: props.tweet.id
+});
+
+const likeForm = useForm({
+    tweet_id: props.tweet.id
+});
+
+function removeSubmit() {
+    removeForm.delete(route('tweet.destroy', props.tweet.id));
+}
+
+function likeSubmit() {
+    likeForm.post(route('like.create'));
+}
+
+function likeRemoveSubmit() {
+    likeForm.delete(route('like.destroy', props.tweet.id));
+}
 
 </script>
 
 <template>
-    <div class="tweet border rounded-lg p-2 mb-2 border-blue-300 flex flex-col">
-        <div class="tweet-author border-b border-b-blue-400 flex gap-3 items-center py-2">
-            <img class="w-[32px] h-[32px] rounded-full" :src="tweet.user.avatar_url" alt="">
-            <div class="flex justify-between w-full">
-                {{ tweet.user.name }}
-                <small class="text-xs">{{ tweet.created_at }}</small>
+    <div class="tweet border rounded-lg p-2 mb-4 bg-gray-100 flex flex-col shadow-lg">
+
+        <div class="tweet-author flex gap-3 py-2 relative">
+
+            <div class="flex items-center">
+                <img class="w-[32px] h-[32px] rounded-full"
+                     src="https://randomuser.me/api/portraits/men/54.jpg" alt="{{ props.tweet.user.name }}">
+                <div class="ml-2 flex flex-col">
+                    <h2>{{ props.tweet.user.name }}</h2>
+                    <span><a href="#" class="text-sm text-gray-700 hover:text-gray-400 transition-colors">@{{ props.tweet.user.username }}</a></span>
+                </div>
             </div>
+
+            <div v-show="authUser.id === tweet.user.id" class="absolute right-0 top-0">
+                <form action="" @submit.prevent="removeSubmit">
+                    <button type="submit" ><XMarkIcon class="w-6 h-6" /></button>
+                </form>
+            </div>
+
         </div>
+
         <div class="tweet-body py-2 px-2">
-            {{ tweet.text }}
+            {{ props.tweet.text }}
         </div>
-        <div class="action-area">
-            Like/ne like/tuda/suda
+
+        <div class="bottom-area">
+
+            <small class="text-xs px-1">
+                <a :href="route('tweet.show', tweet.id)">
+                    {{ props.tweet.created_at }}
+                </a>
+            </small>
+
+            <div class="p-2 action-buttons grid grid-cols-3 flex justify-items-center">
+                <button @click="likeSubmit">
+                    <div v-if="page.props.flash.message && page.props.flash.message === 'liked'">
+                        <HandThumbUpIcon class="w-6 h-6 fill-gray-100" />
+                    </div>
+                    <div v-else>
+                        <HandThumbUpIcon class="w-6 h-6 fill-gray-600" />
+                    </div>
+                </button>
+                <button><ShareIcon class="w-6 h-6" /></button>
+                <button><ChatBubbleLeftIcon class="w-6 h-6" /></button>
+
+<!--                <Disclosure as="div" class="w-full" v-slot="{ open }">-->
+<!--                    <DisclosureButton>-->
+<!--                        <ChatBubbleLeftIcon class="w-6 h-6" />-->
+<!--                    </DisclosureButton>-->
+<!--                    <DisclosurePanel class="mt-4 w-full">-->
+<!--                        <div>-->
+<!--                            <textarea class="w-full resize-none rounded-lg" placeholder="ASDASD">qweqwe</textarea>-->
+<!--                            <button type="submit">-->
+
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </DisclosurePanel>-->
+<!--                </Disclosure>-->
+
+            </div>
+
         </div>
     </div>
 </template>

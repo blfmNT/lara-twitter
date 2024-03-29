@@ -6,12 +6,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TweetController;
+use App\Http\Controllers\LikeController;
 
 
-//test route
+//test routes
 Route::get('/user/{user:id}', [ProfileController::class, 'show']);
 
+
 Route::get('/', [HomeController::class, 'index'])
+    //->middleware(['auth', 'verified'])
     ->middleware('auth')
     ->name('home');
 
@@ -22,9 +25,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/tweet/{tweet:id}', [TweetController::class, 'show'])->name('tweet.show');
     Route::post('/tweet', [TweetController::class, 'create'])->name('tweet.store');
     Route::patch('/tweet', [TweetController::class, 'update'])->name('tweet.update');
-    Route::delete('/tweet', [TweetController::class, 'destroy'])->name('tweet.destroy');
+    Route::delete('/tweet/{tweet:id}', [TweetController::class, 'destroy'])->name('tweet.destroy');
+
+
+    Route::post('/like', [LikeController::class, 'store'])->name('like.create');
+    Route::delete('/like/{like:id}', [LikeController::class, 'destroy'])->name('like.destroy');
 
 });
 
