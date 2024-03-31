@@ -10,16 +10,18 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $tweets = Tweet::orderBy('created_at', 'DESC')->get();
+        $tweets = Tweet::with(['user', 'like'])
+            ->orderBy('id', 'DESC')
+            ->paginate(12);
 
         $tweet_ids = $tweets->pluck('id');
 
-        dd($tweet_ids);
+        //сделать выборку лайков из твитов
 
         return Inertia::render('Home', [
-            'tweets' => $tweets->load(['user']),//reactions
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
+            'tweets' => $tweets,//reactions
+//            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+//            'status' => session('status'),
         ]);
     }
 }

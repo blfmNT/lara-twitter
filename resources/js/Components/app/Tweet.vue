@@ -1,11 +1,7 @@
 <script setup>
 
-import {ShareIcon, ChatBubbleLeftIcon, XMarkIcon } from "@heroicons/vue/24/solid/index.js";
-import {HandThumbUpIcon} from "@heroicons/vue/24/outline/index.js";
+import {HandThumbUpIcon, ShareIcon, ChatBubbleLeftIcon, XMarkIcon } from "@heroicons/vue/24/outline/index.js";
 import {useForm, usePage} from "@inertiajs/vue3";
-
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-import { ChevronUpIcon } from '@heroicons/vue/20/solid'
 
 const page = usePage();
 
@@ -39,9 +35,7 @@ function likeRemoveSubmit() {
 
 <template>
     <div class="tweet border rounded-lg p-2 mb-4 bg-gray-100 flex flex-col shadow-lg">
-
         <div class="tweet-author flex gap-3 py-2 relative">
-
             <div class="flex items-center">
                 <img class="w-[32px] h-[32px] rounded-full"
                      src="https://randomuser.me/api/portraits/men/54.jpg" alt="{{ props.tweet.user.name }}">
@@ -51,15 +45,15 @@ function likeRemoveSubmit() {
                 </div>
             </div>
 
-            <div v-show="authUser.id === tweet.user.id" class="absolute right-0 top-0">
+            <div v-show="authUser.id === tweet.user.id" class="absolute right-0 top-0 text-gray-900 hover:text-red-400 transition-colors">
                 <form action="" @submit.prevent="removeSubmit">
                     <button type="submit" ><XMarkIcon class="w-6 h-6" /></button>
                 </form>
             </div>
-
         </div>
 
         <div class="tweet-body py-2 px-2">
+            <h2>#{{ props.tweet.id }}</h2>
             {{ props.tweet.text }}
         </div>
 
@@ -73,29 +67,16 @@ function likeRemoveSubmit() {
 
             <div class="p-2 action-buttons grid grid-cols-3 flex justify-items-center">
                 <button @click="likeSubmit">
-                    <div v-if="page.props.flash.message && page.props.flash.message === 'liked'">
-                        <HandThumbUpIcon class="w-6 h-6 fill-gray-100" />
+<!--                    <div v-if="page.props.flash.message && page.props.flash.message === 'liked'">-->
+                    <div v-if="tweet.like && tweet.like.liked_by === authUser.id">
+                        <HandThumbUpIcon class="w-6 h-6 fill-black" />
                     </div>
                     <div v-else>
-                        <HandThumbUpIcon class="w-6 h-6 fill-gray-600" />
+                        <HandThumbUpIcon class="w-6 h-6" />
                     </div>
                 </button>
                 <button><ShareIcon class="w-6 h-6" /></button>
                 <button><ChatBubbleLeftIcon class="w-6 h-6" /></button>
-
-<!--                <Disclosure as="div" class="w-full" v-slot="{ open }">-->
-<!--                    <DisclosureButton>-->
-<!--                        <ChatBubbleLeftIcon class="w-6 h-6" />-->
-<!--                    </DisclosureButton>-->
-<!--                    <DisclosurePanel class="mt-4 w-full">-->
-<!--                        <div>-->
-<!--                            <textarea class="w-full resize-none rounded-lg" placeholder="ASDASD">qweqwe</textarea>-->
-<!--                            <button type="submit">-->
-
-<!--                            </button>-->
-<!--                        </div>-->
-<!--                    </DisclosurePanel>-->
-<!--                </Disclosure>-->
 
             </div>
 
@@ -104,5 +85,7 @@ function likeRemoveSubmit() {
 </template>
 
 <style scoped>
-
+.tweet-body {
+    font-family: "Poppins", sans-serif;
+}
 </style>

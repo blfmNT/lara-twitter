@@ -12,57 +12,54 @@ const tweetForm = useForm({
     text: String
 });
 
-function ebuchayaTextAreaUpdate(e) {
+const isShowing = ref(true)
+
+function textAreaUpdate(e) {
     tweetForm.text = e.target.value;
 }
 
 function submit() {
+    const textareaEl = document.querySelector('#textarea');
     tweetForm.post(route('tweet.store'), {
         preserveScroll: true,
         resetOnSuccess: false,
+        onSuccess: () => {
+            tweetForm.reset(),
+            textareaEl.clear();
+        }
     });
 }
-const isShowing = ref(true)
-
-function handleEnterLeave(e) {
-    if (e.type === 'mouseenter') {
-        isShowing.value = true;
-    } else if (e.type === 'mouseleave') {
-        isShowing.value = false;
-    }
-}
-
 
 </script>
 
 <template>
-    <div class="mb-8 border-2 border-dashed border-gray-300 rounded-lg px-2 py-1"
-         @mouseenter="handleEnterLeave"
-         @mouseleave="handleEnterLeave">
+    <div class="mb-4 rounded-lg px-2 py-1"
+        @mouseenter="isShowing = true"
+        @mouseleave="isShowing = false"
+    >
         {{ props.errors }}
 
-        <div v-show="!isShowing" class="items-center text-center">Post something</div>
-
-        <TransitionRoot
-            :show="isShowing"
-            enter="transition-opacity"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="transition-opacity duration-75"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
-        >
             <form @submit.prevent="submit()">
                 <textarea id="textarea"
                     class="rounded-lg w-full resize-none outline-none focus:outline-none focus:ring-0 ring-0 border-0"
-                    @input="ebuchayaTextAreaUpdate"
+                    @input="textAreaUpdate"
                     placeholder="Post something"></textarea>
-                <div class="post-buttons mt-2">
-                    <PrimaryButton type="submit">Post</PrimaryButton>
-                </div>
+                <TransitionRoot
+                    :show="isShowing"
+                    enter="transition-opacity"
+                    enter-from="opacity-0"
+                    enter-to="opacity-100"
+                    leave="transition-opacity duration-75"
+                    leave-from="opacity-100"
+                    leave-to="opacity-0"
+                >
+                    <div class="post-buttons mt-2">
+                        <PrimaryButton type="submit">Post</PrimaryButton>
+                    </div>
+                </TransitionRoot>
+
             </form>
 
-        </TransitionRoot>
     </div>
 
 
