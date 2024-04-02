@@ -9,8 +9,9 @@ class Like extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
     protected $fillable = [
-        'liked_by',
         'tweet_id',
+        'user_id',
     ];
 }

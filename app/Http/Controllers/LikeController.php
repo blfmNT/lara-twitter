@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LikeStoreRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use App\Models\Like;
+use App\Models\Tweet;
 
 class LikeController extends Controller
 {
@@ -13,26 +12,15 @@ class LikeController extends Controller
     {
         $vdata = $request->validated();
         $user = $request->user();
+        $tweet = Tweet::findOrFail($vdata['tweet_id']);
 
-        $like = Like::where('liked_by', $user->id)
-            ->where('tweet_id', $vdata['tweet_id'])
-            ->first();
+        $exists = $tweet->likes()->where('user_id', $user->id)->exists();
 
-        if ($like)
-        {
-            $like->delete();
-            return redirect()->back()->with('message', 'disliked');
-
-        }
+        if ($exists)
+            $tweet->likes()->delete($user->id);
         else
-        {
-            Like::create([
-                'liked_by' => $user->id,
-                'tweet_id' => $vdata['tweet_id'],
-            ]);
-            return redirect()->back()->with('message', 'liked');
-        }
+            $tweet->likes()->create(['user_id' => $user->id]);
+
+        return redirect()->back()->with('message', $exists ? false : true);
     }
-
-
 }

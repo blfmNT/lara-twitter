@@ -29,6 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'username',
         'email',
         'password',
+        'avatar_url',
+        'profile_cover_url',
     ];
 
     /**
@@ -63,7 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function tweets(): HasMany
     {
-        return $this->hasMany(Tweet::class, 'created_by', 'id');
+        return $this->hasMany(Tweet::class);
     }
 
     public function likes(): HasMany

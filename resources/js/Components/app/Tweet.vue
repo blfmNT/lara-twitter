@@ -2,14 +2,19 @@
 
 import {HandThumbUpIcon, ShareIcon, ChatBubbleLeftIcon, XMarkIcon } from "@heroicons/vue/24/outline/index.js";
 import {useForm, usePage} from "@inertiajs/vue3";
+import {ref} from "vue";
 
 const page = usePage();
 
 const props = defineProps({
-    tweet: Object
+    user: Object,
+    tweet: Object,
+    liked: Boolean
 });
 
+const tweetLiked = ref(props.liked ?? false);
 const authUser = usePage().props.auth.user;
+const user = props.user || props.tweet.user;
 
 const removeForm = useForm({
     tweet_id: props.tweet.id
@@ -23,12 +28,14 @@ function removeSubmit() {
     removeForm.delete(route('tweet.destroy', props.tweet.id));
 }
 
-function likeSubmit() {
-    likeForm.post(route('like.create'));
-}
-
-function likeRemoveSubmit() {
-    likeForm.delete(route('like.destroy', props.tweet.id));
+function likeToggle() {
+    likeForm.post(route('like.toggle'), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: (response) => {
+            tweetLiked.value = response.props.flash.message;
+        }
+    });
 }
 
 </script>
@@ -37,15 +44,17 @@ function likeRemoveSubmit() {
     <div class="tweet border rounded-lg p-2 mb-4 bg-gray-100 flex flex-col shadow-lg">
         <div class="tweet-author flex gap-3 py-2 relative">
             <div class="flex items-center">
-                <img class="w-[32px] h-[32px] rounded-full"
-                     src="https://randomuser.me/api/portraits/men/54.jpg" alt="{{ props.tweet.user.name }}">
+                <a :href="route('profile.show', user.id)">
+                    <img class="w-[32px] h-[32px] rounded-full"
+                         src="https://randomuser.me/api/portraits/men/54.jpg" alt="{{ user.name }}">
+                </a>
                 <div class="ml-2 flex flex-col">
-                    <h2>{{ props.tweet.user.name }}</h2>
-                    <span><a href="#" class="text-sm text-gray-700 hover:text-gray-400 transition-colors">@{{ props.tweet.user.username }}</a></span>
+                    <h2><a :href="route('profile.show', user.id)">{{ user.name }}</a></h2>
+                    <span><a :href="route('profile.show', user.id)" >@{{ user.username }}</a></span>
                 </div>
             </div>
 
-            <div v-show="authUser.id === tweet.user.id" class="absolute right-0 top-0 text-gray-900 hover:text-red-400 transition-colors">
+            <div v-show="authUser.id === user.id" class="absolute right-0 top-0 text-gray-900 hover:text-red-400 transition-colors">
                 <form action="" @submit.prevent="removeSubmit">
                     <button type="submit" ><XMarkIcon class="w-6 h-6" /></button>
                 </form>
@@ -53,7 +62,6 @@ function likeRemoveSubmit() {
         </div>
 
         <div class="tweet-body py-2 px-2">
-            <h2>#{{ props.tweet.id }}</h2>
             {{ props.tweet.text }}
         </div>
 
@@ -66,9 +74,8 @@ function likeRemoveSubmit() {
             </small>
 
             <div class="p-2 action-buttons grid grid-cols-3 flex justify-items-center">
-                <button @click="likeSubmit">
-<!--                    <div v-if="page.props.flash.message && page.props.flash.message === 'liked'">-->
-                    <div v-if="tweet.like && tweet.like.liked_by === authUser.id">
+                <button @click="likeToggle">
+                    <div v-if="tweetLiked">
                         <HandThumbUpIcon class="w-6 h-6 fill-black" />
                     </div>
                     <div v-else>

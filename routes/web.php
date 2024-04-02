@@ -18,8 +18,10 @@ Route::get('/', [HomeController::class, 'index'])
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile/{user:id}', [ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/settings', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/covers', [ProfileController::class, 'updateCovers'])->name('profile.covers');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/tweet/{tweet:id}', [TweetController::class, 'show'])->name('tweet.show');
@@ -28,8 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/tweet/{tweet:id}', [TweetController::class, 'destroy'])->name('tweet.destroy');
 
 
-    Route::post('/like', [LikeController::class, 'store'])->name('like.create');
-    Route::delete('/like/{like:id}', [LikeController::class, 'destroy'])->name('like.destroy');
+    Route::post('/like', [LikeController::class, 'store'])->name('like.toggle');
 
 });
 

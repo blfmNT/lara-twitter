@@ -19,7 +19,7 @@ class TweetFactory extends Factory
     {
         return [
             'text' => fake()->text(255),
-            'created_by' => 1, //
+            'user_id' => User::inRandomOrder()->first(), //
         ];
     }
 }

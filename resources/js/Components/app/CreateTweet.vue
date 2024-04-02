@@ -24,8 +24,7 @@ function submit() {
         preserveScroll: true,
         resetOnSuccess: false,
         onSuccess: () => {
-            tweetForm.reset(),
-            textareaEl.clear();
+            tweetForm.reset()
         }
     });
 }

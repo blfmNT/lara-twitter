@@ -4,7 +4,9 @@ import {onMounted, ref} from "vue";
 import {router, usePage} from "@inertiajs/vue3";
 
 const props = defineProps({
-    tweets: Object
+    user: Object,
+    tweets: Object,
+    likes: Array
 });
 
 const page = usePage();
@@ -38,11 +40,15 @@ onMounted(() => {
     observer.observe(observeMe.value);
 });
 
+function isTweetLiked(tweet_id) {
+    return props.likes.indexOf(tweet_id) !== -1;
+}
+
 </script>
 
 <template>
     <div>
-        <Tweet v-for="tweet in tweetsState" :tweet="tweet" />
+        <Tweet v-for="tweet in tweetsState" :tweet="tweet" :user="props.user" :liked="isTweetLiked(tweet.id)" />
         <div ref="observeMe"></div>
     </div>
 </template>

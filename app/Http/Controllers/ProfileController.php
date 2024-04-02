@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdateCoversRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Like;
+use App\Models\Tweet;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -14,6 +18,19 @@ use Inertia\Response;
 use App\Models\User;
 class ProfileController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $tweets = $user->tweets();
+
+        return Inertia::render('Profile/View', [
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
+            'status' => session('status'),
+            'user' => new UserResource($user),
+            'tweets' => $tweets,
+        ]);
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -64,13 +81,41 @@ class ProfileController extends Controller
 
     public function show(User $user)
     {
-        $tweets = $user->tweets();
+        $tweets = $user->tweets()->paginate(12);
+        $likes = Like::select('tweet_id')->where('user_id', $user->id)->get();
+        $likes = array_column($likes->toArray(), 'tweet_id');
 
         return Inertia::render('Profile/View', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
             'user' => new UserResource($user),
             'tweets' => $tweets,
+            'likes' => $likes,
         ]);
     }
+
+    public function updateCovers(UpdateCoversRequest $request): RedirectResponse
+    {
+        $vdata = $request->validated();
+        $user = $request->user();
+
+        /** @var UploadedFile $avatar */
+        $avatar = $vdata['avatar'] ?? null;
+        /** @var UploadedFile $profile_cover */
+        $profile_cover = $vdata['profile_cover'] ?? null;
+
+        if ($avatar) {
+            $avatar_url = $avatar->store('avatars/' . $user->id, 'public');
+            $user->update(['avatar_url' => $avatar_url]);
+        }
+
+        if ($profile_cover) {
+            $profile_cover_url = $profile_cover->store('covers/' . $user->id,'public');
+            $user->update(['profile_cover_url' => $profile_cover_url]);
+        }
+
+        return redirect()->back();
+    }
+
+
 }

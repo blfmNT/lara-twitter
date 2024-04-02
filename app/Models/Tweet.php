@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use App\Models\Like;
 
@@ -29,12 +29,12 @@ class Tweet extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class,  'created_by', 'id');
+        return $this->belongsTo(User::class);
     }
 
-    public function like(): HasOne
+    public function likes(): HasMany
     {
-        return $this->hasOne(Like::class);
+        return $this->hasMany(Like::class);
     }
 
 }

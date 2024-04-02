@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('likes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tweet_id')->constrained('tweets');
-            $table->foreignId('liked_by')
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
         });
